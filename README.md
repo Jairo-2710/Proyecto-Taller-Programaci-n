@@ -33,4 +33,4 @@ Analysis: En esta ultima etapa se realizara la documentacion de las especificaci
 MVP Delivery: Por ultimo se entregara el producto mínimo viable funcional para una evaluación al final del semestre
 
 
-The project is currently under active development. New features, improvements, documentation, and changes will be added throughout the semester.The final goal is to complete a functional Minimum Viable Product (MVP) that demonstrates the knowledge and programming skills acquired during the Programming Workshop course.
+El proyecto sigue en fase de desarrollo por lo que lo los requerimientos e funcionalidades se agregaran durante todo el semestre concluyendo con la entrega de un producto mínimo viable MVP
