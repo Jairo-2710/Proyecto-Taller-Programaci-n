@@ -1,0 +1,20 @@
+# Entorno virtual (se recrea con setup.bat / python -m venv .venv)
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Variables de entorno y bases de datos locales
+.env
+*.db
+*.sqlite3
+
+# Editor / sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
