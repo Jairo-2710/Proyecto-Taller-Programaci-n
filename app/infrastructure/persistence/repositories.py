@@ -267,7 +267,7 @@ class SqlIncidenteRepository(_RepositorioSQL):
     def reportados_en_rango(self, desde: datetime, hasta: datetime) -> list[Incidente]:
         return self._entidades(
             self._s.scalars(
-                select(IncidenteORM).where(IncidenteORM.fecha_reporte >= desde, IncidenteORM.fecha_reporte < hasta)
+                select(IncidenteORM).where(IncidenteORM.fecha_reporte >= desde, IncidenteORM.fecha_reporte <= hasta)
             )
         )
 
