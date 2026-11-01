@@ -1,9 +1,13 @@
-"""Configuración central. Todo se puede sobrescribir con variables de entorno."""
+"""Configuración central. Todo se puede sobrescribir con variables de entorno.
+
+Solo la capa de infraestructura y el punto de composición (api/container.py) leen este módulo;
+el dominio y la aplicación reciben sus parámetros por constructor.
+"""
 import os
 from datetime import datetime, timedelta, timezone
 
 APP_NAME = "Sistema Inteligente de Gestión y Optimización de Recursos Tecnológicos Universitarios"
-APP_VERSION = "0.1.0"
+APP_VERSION = "0.2.0"
 
 # Base de datos: SQLite para desarrollo; PostgreSQL en producción, por ejemplo
 # DATABASE_URL=postgresql+psycopg2://usuario:clave@localhost:5432/recursos
@@ -29,6 +33,23 @@ INCIDENTES_PARA_REVISION = int(os.getenv("INCIDENTES_PARA_REVISION", "3"))
 DIAS_MANTENIMIENTO_PROLONGADO = int(os.getenv("DIAS_MANTENIMIENTO_PROLONGADO", "7"))
 MIN_ASIGNACIONES_ANALISIS = int(os.getenv("MIN_ASIGNACIONES_ANALISIS", "10"))
 MIN_DIAS_PERIODO_ANALISIS = int(os.getenv("MIN_DIAS_PERIODO_ANALISIS", "7"))
+
+# --- APIs públicas colombianas (ambas exponen la API SODA de Socrata)
+# Los identificadores de dataset se pueden cambiar sin tocar el código. Por defecto ambas fuentes
+# apuntan a DIVIPOLA (códigos de municipios, producto del DANE publicado en datos.gov.co).
+DATOS_GOV_BASE_URL = os.getenv("DATOS_GOV_BASE_URL", "https://www.datos.gov.co")
+DATOS_GOV_DATASET_ID = os.getenv("DATOS_GOV_DATASET_ID", "gdxc-w37w")
+DANE_BASE_URL = os.getenv("DANE_BASE_URL", "https://www.datos.gov.co")
+DANE_DATASET_ID = os.getenv("DANE_DATASET_ID", "gdxc-w37w")
+SOCRATA_APP_TOKEN = os.getenv("SOCRATA_APP_TOKEN", "")  # opcional: sube el límite de peticiones
+OPENDATA_LIMITE_REGISTROS = int(os.getenv("OPENDATA_LIMITE_REGISTROS", "2000"))
+OPENDATA_TIMEOUT_S = float(os.getenv("OPENDATA_TIMEOUT_S", "10"))
+
+# --- Resiliencia
+BREAKER_UMBRAL_FALLOS = int(os.getenv("BREAKER_UMBRAL_FALLOS", "3"))
+BREAKER_RECUPERACION_S = float(os.getenv("BREAKER_RECUPERACION_S", "30"))
+RETRY_INTENTOS = int(os.getenv("RETRY_INTENTOS", "3"))
+RETRY_BASE_S = float(os.getenv("RETRY_BASE_S", "0.5"))
 
 # Colombia no usa horario de verano: UTC-5 fijo.
 COL_TZ = timezone(timedelta(hours=-5))

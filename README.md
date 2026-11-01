@@ -49,18 +49,26 @@ Proyecto-Taller-Programacion/
 ├── .env.example            # Variables de entorno de ejemplo
 ├── .gitignore
 ├── app/
-│   ├── config.py           # Configuración y parámetros de las reglas
-│   ├── database.py         # Motor y sesiones SQLAlchemy
-│   ├── models.py           # Modelo de datos relacional
-│   ├── schemas.py          # Validación (Pydantic) y contratos OpenAPI
-│   ├── security.py         # Hash de contraseñas (scrypt) y JWT
-│   ├── deps.py             # Autenticación y control por roles
-│   ├── routers/            # Capa de presentación (endpoints)
-│   └── services/           # Lógica de negocio: asignaciones, equipos, análisis, auditoría
+│   ├── config.py           # Configuración y parámetros
+│   ├── domain/             # Entidades, políticas y puertos (sin frameworks), por contexto:
+│   │                       #   identidad · inventario · asignaciones · mantenimiento · analitica · shared
+│   ├── application/        # Casos de uso con inyección de dependencias por constructor
+│   ├── infrastructure/     # Adaptadores: persistence (SQLAlchemy), security, resilience
+│   │                       #   (circuit breaker + retry), opendata (datos.gov.co/DANE), analytics (DuckDB)
+│   └── api/                # Routers FastAPI, schemas, composition root (container.py) y panel /ui
 ├── tests/                  # Pruebas con pytest
 ├── scripts/seed_demo.py    # Datos de demostración
-└── docs/                   # Backlog y modelo de datos
+└── docs/                   # Backlog, modelo de datos y ADR (docs/adr, en inglés)
 ```
+
+## Arquitectura hexagonal (Guía 6)
+
+`api → application → domain ← infrastructure`: el dominio no importa frameworks (lo verifica `tests/test_arquitectura.py`). Ver [ADR 0001](docs/adr/0001-hexagonal-architecture-and-bounded-contexts.md) y [ADR 0002](docs/adr/0002-resilience-and-open-data-analytics.md).
+
+- **APIs públicas:** datos.gov.co y DANE (SODA) con circuit breaker de 3 estados (CLOSED/OPEN/HALF_OPEN) y retry con backoff exponencial. Por defecto ambas usan el dataset DIVIPOLA `gdxc-w37w`; se cambian con `DATOS_GOV_DATASET_ID` / `DANE_DATASET_ID` (ver `.env.example`). Verifica desde tu PC: `python -m scripts.verificar_apis`.
+- **DuckDB:** `/analitica/equipos`, `/analitica/asignaciones`, `/datos-abiertos/analisis` (SQL con promedio, mediana, desviación y percentiles).
+- **Panel web:** http://127.0.0.1:8000/ui (login + gráficas + estado del circuit breaker).
+- **CI:** `.github/workflows/ci.yml` ejecuta `pytest` en cada push.
 
 El `.venv/` y los `__pycache__/` no se suben a GitHub (están en `.gitignore`); se regeneran con `setup.bat`.
 

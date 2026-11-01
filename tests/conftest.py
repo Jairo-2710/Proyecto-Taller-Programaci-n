@@ -8,8 +8,8 @@ os.environ["ADMIN_PASSWORD"] = "Admin12345!"
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
 
-from app.database import Base, engine  # noqa: E402
-from app.init_db import init_db  # noqa: E402
+from app.infrastructure.persistence.database import Base, engine  # noqa: E402
+from app.infrastructure.persistence.bootstrap import init_db  # noqa: E402
 from main import app  # noqa: E402
 
 CLAVE = "Clave12345!"
