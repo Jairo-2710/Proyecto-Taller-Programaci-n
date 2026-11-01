@@ -10,10 +10,10 @@ import argparse
 
 from sqlalchemy import select
 
-from app.database import SessionLocal
-from app.enums import TipoEquipo
-from app.init_db import init_db
-from app.models import Equipo, Zona
+from app.domain.shared.enums import TipoEquipo
+from app.infrastructure.persistence.bootstrap import init_db
+from app.infrastructure.persistence.database import SessionLocal
+from app.infrastructure.persistence.orm import EquipoORM as Equipo, ZonaORM as Zona
 
 
 def main(aio: int, portatiles: int) -> None:
