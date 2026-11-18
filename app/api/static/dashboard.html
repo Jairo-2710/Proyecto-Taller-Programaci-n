@@ -92,7 +92,13 @@
       <h2>Estadísticas descriptivas de los equipos</h2>
       <p class="sub">Consulta SQL en DuckDB: cantidad, RAM (promedio, mínimo, máximo, desviación) y % disponible por zona y tipo.</p>
       <div id="eq-bars" class="bars"></div>
-      <div class="scroll"><table id="eq-tabla"></table></div>
+      <div class="scroll">
+  <table id="eq-tabla">
+    <thead>
+      <tr><th scope="col">Estadísticas de equipos</th></tr>
+    </thead>
+  </table>
+</div>
     </section>
 
     <section>
@@ -102,7 +108,13 @@
         <div><b style="font-size:13px">Horas totales por zona</b><div id="as-bars" class="bars"></div></div>
         <div><b style="font-size:13px">Horas de inicio más frecuentes</b><div id="pico-bars" class="bars"></div></div>
       </div>
-      <div class="scroll"><table id="as-tabla"></table></div>
+      <div class="scroll">
+  <table id="as-tabla">
+    <thead>
+      <tr><th scope="col">Estadísticas de asignaciones</th></tr>
+    </thead>
+  </table>
+</div>
       <p id="as-vacio" class="sub hidden">Todavía no hay asignaciones en el periodo.</p>
     </section>
 
@@ -121,7 +133,13 @@
       <div id="abiertos-msg" class="warn"></div>
       <div class="grid2" style="margin-top:12px">
         <div><b style="font-size:13px">datos.gov.co · departamentos con más municipios</b><div id="rank-bars" class="bars"></div></div>
-        <div><b style="font-size:13px">DANE · municipios por departamento (estadísticos)</b><div class="scroll"><table id="est-tabla"></table></div></div>
+        <div><b style="font-size:13px">DANE · municipios por departamento (estadísticos)</b><div class="scroll">
+  <table id="est-tabla">
+    <thead>
+      <tr><th scope="col">Estadísticas de departamentos</th></tr>
+    </thead>
+  </table>
+</div></div>
       </div>
     </section>
   </div>
@@ -147,8 +165,11 @@ function crear(tag, texto, clase) {
 }
 
 function tabla(el, filas) {
+  if (!filas || !filas.length) {
+    return;
+  }
+
   limpiar(el);
-  if (!filas || !filas.length) return;
   const cols = Object.keys(filas[0]);
 const thead = crear("thead"), trh = crear("tr");
 
