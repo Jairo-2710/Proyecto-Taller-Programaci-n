@@ -7,6 +7,9 @@ on:
       - Sonar-Cloud
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -35,7 +38,7 @@ jobs:
       - name: Export mutation statistics
         run: mutmut export-cicd-stats
 
-      - name: Validate minimum Mutation Score of 50%
+      - name: Validate minimum Mutation Score above 60%
         run: |
           python - <<'PY'
           import json
@@ -59,15 +62,15 @@ jobs:
               sys.exit(1)
 
           score = eliminados / total * 100
-          minimo = 50.0
+          minimo = 60.0
 
           print(f"Mutants killed: {eliminados}")
           print(f"Total mutants: {total}")
           print(f"Mutation Score: {score:.2f}%")
           print(f"Minimum threshold: {minimo:.2f}%")
 
-          if score < minimo:
-              print("ERROR: Mutation Score is below 50%.")
+          if score <= minimo:
+              print("ERROR: Mutation Score must be above 60%.")
               sys.exit(1)
 
           print("OK: Mutation Score passed.")
