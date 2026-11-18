@@ -1,3 +1,4 @@
+
 name: CI
 
 on:
@@ -8,11 +9,68 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: pip
-      - run: pip install -r requirements.txt
-      - run: pytest -q
+
+      - name: Instalar dependencias del proyecto
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Instalar mutmut
+        run: pip install mutmut==3.8.1
+
+      - name: Ejecutar pruebas unitarias
+        run: pytest -q
+
+      - name: Ejecutar Mutation Testing
+        run: mutmut run --max-children 4
+
+      - name: Exportar estadísticas de mutación
+        run: mutmut export-cicd-stats
+
+      - name: Validar Mutation Score mínimo del 50%
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          archivo = Path("mutants/mutmut-cicd-stats.json")
+
+          if not archivo.exists():
+              print("ERROR: No se encontró el archivo de estadísticas.")
+              sys.exit(1)
+
+          with archivo.open(encoding="utf-8") as f:
+              datos = json.load(f)
+
+          eliminados = datos["killed"]
+          total = datos["total"]
+
+          if total <= 0:
+              print("ERROR: No hay mutantes para calcular el score.")
+              sys.exit(1)
+
+          score = eliminados / total * 100
+          minimo = 50.0
+
+          print(f"Mutantes eliminados: {eliminados}")
+          print(f"Mutantes totales: {total}")
+          print(f"Mutation Score: {score:.2f}%")
+          print(f"Umbral mínimo: {minimo:.2f}%")
+
+          if score < minimo:
+              print("ERROR: Mutation Score inferior al 50%.")
+              sys.exit(1)
+
+          print("OK: Mutation Score aprobado.")
+          PY

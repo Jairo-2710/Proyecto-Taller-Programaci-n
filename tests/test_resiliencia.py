@@ -124,3 +124,19 @@ def test_reintentar_no_reintenta_errores_no_reintentables():
     with pytest.raises(KeyError):
         reintentar(lambda: {}["x"], dormir=esperas.append, reintentables=(ConnectionError,))
     assert esperas == []
+def test_reiniciar_devuelve_el_circuito_a_cerrado():
+    cb = _breaker(Reloj())
+
+    for _ in range(3):
+        with pytest.raises(ConnectionError):
+            cb.ejecutar(_falla)
+
+    assert cb.estado == EstadoCircuito.abierto
+    assert cb.fallos_consecutivos == 3
+
+    cb.reiniciar()
+
+    assert cb.estado == EstadoCircuito.cerrado
+    assert cb.fallos_consecutivos == 0
+    assert cb.ejecutar(lambda: "ok") == "ok"
+    assert cb.transiciones[-1] == "OPEN → CLOSED: reinicio manual"
