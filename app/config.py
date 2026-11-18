@@ -23,6 +23,13 @@ ADMIN_NOMBRE = os.getenv("ADMIN_NOMBRE", "Administrador")
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@umb.local")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "Admin12345!")
 
+# Datos de demostración: al arrancar con la base vacía se cargan equipos y usuarios de ejemplo para
+# poder usar el sistema sin ejecutar comandos. Poner CARGAR_DATOS_DEMO=false en producción
+# (los usuarios de demostración tienen contraseñas públicas).
+CARGAR_DATOS_DEMO = os.getenv("CARGAR_DATOS_DEMO", "true").strip().lower() in ("1", "true", "si", "sí", "yes")
+DEMO_EQUIPOS_AIO = int(os.getenv("DEMO_EQUIPOS_AIO", "15"))
+DEMO_EQUIPOS_PORTATILES = int(os.getenv("DEMO_EQUIPOS_PORTATILES", "5"))
+
 # Reglas de negocio y parámetros del análisis (ajustables tras el levantamiento de información)
 HORAS_OPERATIVAS_DIA = float(os.getenv("HORAS_OPERATIVAS_DIA", "14"))  # p. ej. 7:00 a 21:00
 MAX_HORAS_ASIGNACION = float(os.getenv("MAX_HORAS_ASIGNACION", "12"))

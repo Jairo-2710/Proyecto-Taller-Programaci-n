@@ -26,7 +26,7 @@ if errorlevel 1 (
 )
 
 call .venv\Scripts\activate.bat
-python -m pip install -r requirements.txt
+python -m pip install --only-binary=:all: --require-hashes -r requirements.lock
 if errorlevel 1 (
     echo Fallo la instalacion de librerias. Se recomienda Python 3.11.
     exit /b 1

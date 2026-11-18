@@ -1,9 +1,10 @@
-
 name: CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - Sonar-Cloud
   pull_request:
 
 jobs:
@@ -11,33 +12,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Descargar repositorio
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v7
 
-      - name: Configurar Python
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v7
         with:
           python-version: "3.11"
           cache: pip
+          cache-dependency-path: requirements.lock
 
-      - name: Instalar dependencias del proyecto
+      - name: Install project dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install --only-binary=:all: --require-hashes -r requirements.lock
 
-      - name: Instalar mutmut
-        run: pip install mutmut==3.8.1
+      - name: Run unit tests
+        run: python -m pytest -q
 
-      - name: Ejecutar pruebas unitarias
-        run: pytest -q
-
-      - name: Ejecutar Mutation Testing
+      - name: Run Mutation Testing
         run: mutmut run --max-children 4
 
-      - name: Exportar estadísticas de mutación
+      - name: Export mutation statistics
         run: mutmut export-cicd-stats
 
-      - name: Validar Mutation Score mínimo del 50%
+      - name: Validate minimum Mutation Score of 50%
         run: |
           python - <<'PY'
           import json
@@ -47,7 +45,7 @@ jobs:
           archivo = Path("mutants/mutmut-cicd-stats.json")
 
           if not archivo.exists():
-              print("ERROR: No se encontró el archivo de estadísticas.")
+              print("ERROR: Mutation statistics file not found.")
               sys.exit(1)
 
           with archivo.open(encoding="utf-8") as f:
@@ -57,20 +55,20 @@ jobs:
           total = datos["total"]
 
           if total <= 0:
-              print("ERROR: No hay mutantes para calcular el score.")
+              print("ERROR: No mutants available to calculate the score.")
               sys.exit(1)
 
           score = eliminados / total * 100
           minimo = 50.0
 
-          print(f"Mutantes eliminados: {eliminados}")
-          print(f"Mutantes totales: {total}")
+          print(f"Mutants killed: {eliminados}")
+          print(f"Total mutants: {total}")
           print(f"Mutation Score: {score:.2f}%")
-          print(f"Umbral mínimo: {minimo:.2f}%")
+          print(f"Minimum threshold: {minimo:.2f}%")
 
           if score < minimo:
-              print("ERROR: Mutation Score inferior al 50%.")
+              print("ERROR: Mutation Score is below 50%.")
               sys.exit(1)
 
-          print("OK: Mutation Score aprobado.")
+          print("OK: Mutation Score passed.")
           PY

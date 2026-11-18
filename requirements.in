@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pydantic
+sqlalchemy
+PyJWT
+duckdb
+pytest
+httpx2
+
+mutmut==3.8.1
