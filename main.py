@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse """cambio hecho por sonarcloud.io"""
 
 from app.api.errors import registrar_manejadores
 from app.api.routers import analisis, asignaciones, auth, equipos, incidentes, usuarios
@@ -65,11 +65,15 @@ def inicio():
 def salud():
     return {"estado": "ok"}
 
-
-@app.get("/ui", response_class=HTMLResponse, include_in_schema=False)
+"""cambio proporcinado por sonarcloud.io"""
+@app.get("/ui", response_class=FileResponse, include_in_schema=False)
 def panel():
     """Panel web: inicia sesión con JWT y consulta la API desde el navegador."""
-    return PANEL_HTML.read_text(encoding="utf-8")
+    return FileResponse(
+        path=PANEL_HTML,
+        media_type="text/html",
+        headers={"X-Content-Type-Options": "nosniff"}
+    )
 
 
 for enrutador in (
