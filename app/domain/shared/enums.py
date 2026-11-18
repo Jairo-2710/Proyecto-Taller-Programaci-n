@@ -7,6 +7,7 @@ class Rol(StrEnum):
     soporte = "soporte"
     docente = "docente"
     coordinador = "coordinador"
+    estudiante = "estudiante"  # solo consulta: equipos y disponibilidad
 
 
 class TipoEquipo(StrEnum):
