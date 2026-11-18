@@ -150,9 +150,16 @@ function tabla(el, filas) {
   limpiar(el);
   if (!filas || !filas.length) return;
   const cols = Object.keys(filas[0]);
-  const thead = crear("thead"), trh = crear("tr");
-  cols.forEach((c) => trh.appendChild(crear("th", c.replaceAll("_", " "))));
-  thead.appendChild(trh); el.appendChild(thead);
+const thead = crear("thead"), trh = crear("tr");
+
+cols.forEach((c) => {
+  const th = crear("th", c.replaceAll("_", " "));
+  th.setAttribute("scope", "col");
+  trh.appendChild(th);
+});
+
+thead.appendChild(trh);
+el.appendChild(thead);
   const tbody = crear("tbody");
   filas.forEach((f) => {
     const tr = crear("tr");

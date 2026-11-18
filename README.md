@@ -43,7 +43,7 @@ El proyecto sigue en desarrollo: los requerimientos y funcionalidades se agregan
 ```
 Proyecto-Taller-Programacion/
 ├── main.py                 # Punto de entrada FastAPI (uvicorn main:app)
-├── requirements.txt        # Dependencias con versiones fijas
+├── requirements.lock      # Dependencias con versiones y hashes
 ├── setup.bat               # Crea .venv, instala librerías y genera __pycache__ (Windows)
 ├── pytest.ini
 ├── .env.example            # Variables de entorno de ejemplo
@@ -85,7 +85,7 @@ Equivalente manual:
 ```bat
 py -3.11 -m venv .venv
 .venv\Scripts\activate
-python -m pip install -r requirements.txt
+python -m pip install --only-binary=:all: --require-hashes -r requirements.lock
 uvicorn main:app --reload
 ```
 
