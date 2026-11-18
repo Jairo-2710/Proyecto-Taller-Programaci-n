@@ -57,7 +57,7 @@ Proyecto-Taller-Programacion/
 │   │                       #   (circuit breaker + retry), opendata (datos.gov.co/DANE), analytics (DuckDB)
 │   └── api/                # Routers FastAPI, schemas, composition root (container.py) y panel /ui
 ├── tests/                  # Pruebas con pytest
-├── scripts/seed_demo.py    # Datos de demostración
+├── scripts/seed_demo.py    # Agrega más equipos de demostración (los 20 iniciales ya se cargan solos)
 └── docs/                   # Backlog, modelo de datos y ADR (docs/adr, en inglés)
 ```
 
@@ -91,7 +91,17 @@ uvicorn main:app --reload
 
 - Documentación interactiva (OpenAPI 3): <http://127.0.0.1:8000/docs>
 - Administrador inicial (solo desarrollo): `admin@umb.local` / `Admin12345!`. Cámbielo con las variables `ADMIN_EMAIL` y `ADMIN_PASSWORD` (ver `.env.example`) y defina `SECRET_KEY` propia.
-- Datos de demostración: `python -m scripts.seed_demo --aio 20 --portatiles 5`
+- **Datos de demostración (automáticos):** al arrancar con la base vacía se cargan 20 equipos (AIO-001…AIO-015 y PRT-001…PRT-005) y estos usuarios, sin ejecutar ningún comando:
+
+  | Rol | Correo | Contraseña |
+  |---|---|---|
+  | administrador | `admin@umb.local` | `Admin12345!` |
+  | encargado_sala | `encargado1@umb.local` | `Encargado123!` |
+  | encargado_sala | `encargado2@umb.local` | `Encargado123!` |
+  | estudiante | `estudiante@umb.local` | `Estudiante123!` |
+
+  Solo se cargan si no hay equipos, así que reiniciar no duplica nada ni pisa datos reales. En producción defina `CARGAR_DATOS_DEMO=false`.
+- Agregar más equipos: `python -m scripts.seed_demo --aio 30 --portatiles 10` (cantidad total deseada; solo crea los códigos que faltan).
 - Base de datos: SQLite por defecto; para PostgreSQL defina `DATABASE_URL=postgresql+psycopg2://usuario:clave@host:5432/base`.
 
 Flujo básico en `/docs`: `POST /auth/login` → copiar el `access_token` → botón **Authorize** → probar los endpoints.
@@ -102,20 +112,22 @@ Flujo básico en `/docs`: `POST /auth/login` → copiar el `access_token` → bo
 python -m pytest
 ```
 
-24 pruebas cubren autenticación, permisos por rol, validación de datos, unicidad de códigos, conflictos de horario, equipos fuera de servicio, flujo de incidentes y mantenimientos, cálculo de indicadores y recomendaciones.
+64 pruebas cubren autenticación, permisos por rol, validación de datos, unicidad de códigos, conflictos de horario, equipos fuera de servicio, flujo de incidentes y mantenimientos, cálculo de indicadores y recomendaciones, datos de demostración y el rol estudiante.
 
 ## Roles y permisos
 
-| Operación | administrador | encargado_sala | soporte | docente | coordinador |
-|---|:-:|:-:|:-:|:-:|:-:|
-| Consultar equipos, zonas y disponibilidad | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Crear/editar/desactivar equipos y zonas; usuarios; auditoría | ✓ | | | | |
-| Crear/cancelar asignaciones y solicitudes | ✓ | ✓ | | | |
-| Consultar historial de asignaciones | ✓ | ✓ | | ✓ | ✓ |
-| Reportar un incidente | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Consultar incidentes, mantenimientos e historial del equipo | ✓ | ✓ | ✓ | | ✓ |
-| Atender incidentes y gestionar mantenimientos | ✓ | | ✓ | | |
-| Indicadores y recomendaciones | ✓ | ✓ | ✓ | | ✓ |
+| Operación | administrador | encargado_sala | soporte | docente | coordinador | estudiante |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|
+| Consultar equipos, zonas y disponibilidad | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Crear/editar/desactivar equipos y zonas; usuarios; auditoría | ✓ | | | | | |
+| Crear/cancelar asignaciones y solicitudes | ✓ | ✓ | | | | |
+| Consultar historial de asignaciones | ✓ | ✓ | | ✓ | ✓ | |
+| Reportar un incidente | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Consultar incidentes, mantenimientos e historial del equipo | ✓ | ✓ | ✓ | | ✓ | |
+| Atender incidentes y gestionar mantenimientos | ✓ | | ✓ | | | |
+| Indicadores y recomendaciones | ✓ | ✓ | ✓ | | ✓ | |
+
+El **estudiante** solo consulta el catálogo y la disponibilidad: el préstamo lo registra el personal (administrador o encargado de sala), de acuerdo con el alcance, que excluye la asignación automática sin supervisión.
 
 ## Endpoints principales
 
@@ -154,7 +166,7 @@ utilización = horas de asignación activa dentro del periodo
 
 - La verificación de cruces se hace en la aplicación; con varias instancias y PostgreSQL conviene reforzarla con una restricción de exclusión a nivel de base de datos.
 - Las tablas se crean con `create_all`; para evolucionar el esquema en producción se recomienda Alembic.
-- La interfaz de usuario (HTML/CSS/JS) es opcional según la propuesta y no está incluida.
+- La interfaz web (`/ui`) es un panel de solo lectura con estadísticas; los préstamos se registran desde la documentación interactiva `/docs`.
 - No hay integración con autenticación institucional (fuera del alcance inicial).
 
 ## Referencias (APA 7.ª edición)

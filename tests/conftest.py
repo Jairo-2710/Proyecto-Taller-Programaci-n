@@ -4,6 +4,7 @@ import os
 os.environ["DATABASE_URL"] = "sqlite://"
 os.environ["ADMIN_EMAIL"] = "admin@umb.local"
 os.environ["ADMIN_PASSWORD"] = "Admin12345!"
+os.environ["CARGAR_DATOS_DEMO"] = "false"  # las pruebas parten de una base vacía
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
@@ -37,7 +38,7 @@ def admin(client):
 def usuarios(client, admin):
     """Un usuario por rol, devuelve {rol: encabezados}."""
     tokens = {"administrador": admin}
-    for rol in ("encargado_sala", "soporte", "docente", "coordinador"):
+    for rol in ("encargado_sala", "soporte", "docente", "coordinador", "estudiante"):
         r = client.post(
             "/usuarios",
             headers=admin,

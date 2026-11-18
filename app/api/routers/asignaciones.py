@@ -7,7 +7,7 @@ from ...domain.asignaciones.entities import SolicitudEquipos
 from ...domain.identidad.entities import Usuario
 from ...domain.shared.enums import EstadoAsignacion, Rol
 from ..container import get_asignacion_service
-from ..deps import requiere_roles, usuario_actual
+from ..deps import requiere_roles
 from ..schemas import (
     AsignacionCrear,
     AsignacionOut,
@@ -79,7 +79,11 @@ def listar_asignaciones(
 
 @router.get("/{asignacion_id}", response_model=AsignacionOut)
 def obtener_asignacion(
-    asignacion_id: int, servicio: AsignacionService = Depends(get_asignacion_service), _: Usuario = Depends(usuario_actual)
+    asignacion_id: int,
+    servicio: AsignacionService = Depends(get_asignacion_service),
+    _: Usuario = Depends(
+        requiere_roles(Rol.administrador, Rol.encargado_sala, Rol.soporte, Rol.docente, Rol.coordinador)
+    ),
 ):
     return servicio.obtener(asignacion_id)
 
