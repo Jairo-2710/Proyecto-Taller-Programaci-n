@@ -2,7 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - Sonar-Cloud
   pull_request:
 
 jobs:
@@ -10,14 +12,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v7
+      - name: Checkout repository
+        uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v7
+      - name: Set up Python
+        uses: actions/setup-python@v7
         with:
           python-version: "3.11"
           cache: pip
           cache-dependency-path: requirements.lock
 
-      - run: python -m pip install --only-binary=:all: --require-hashes -r requirements.lock
+      - name: Install dependencies
+        run: python -m pip install --only-binary=:all: --require-hashes -r requirements.lock
 
-      - run: pytest -q
+      - name: Run tests
+        run: python -m pytest -q
